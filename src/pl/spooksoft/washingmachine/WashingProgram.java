@@ -7,7 +7,6 @@ public class WashingProgram {
     private int maxSpinSpeed;
     private int approximateDuration;
 
-
     public WashingProgram(String programName, int maxSpinSpeed, int defaultSpinSpeed, int approximateDuration) {
 
         this.defaultSpinSpeed = defaultSpinSpeed;

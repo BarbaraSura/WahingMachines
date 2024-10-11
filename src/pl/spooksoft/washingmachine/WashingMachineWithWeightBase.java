@@ -11,7 +11,7 @@ public class WashingMachineWithWeightBase extends WashingMachineBase {
         this.currentLoadWeight = currentLoadWeight;
     }
 
-    // if currentLoadWeigth> maxLoad -> exeption "Ładunek jest za duży"
+    //if (currentLoadWeigth > maxLoad -> exeption "Ładunek jest za duży"
 
 
 }

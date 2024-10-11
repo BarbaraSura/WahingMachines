@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class WhirpoolWashingMachineDefinition extends WashingMachineDefinition {
 
     public WhirpoolWashingMachineDefinition() {
-        super(6);
+        super(6, 0.5f,1);
     }
 
     @Override

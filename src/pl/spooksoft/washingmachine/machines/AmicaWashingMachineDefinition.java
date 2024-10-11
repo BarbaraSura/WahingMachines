@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class AmicaWashingMachineDefinition extends DefaultWashingMachineDefinition {
 
     public AmicaWashingMachineDefinition() {
-        super(8);
+        super(8, 0.5f, 1);
     }
 
 

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 public class DefaultWashingMachineDefinition extends WashingMachineDefinition {
 
-    public DefaultWashingMachineDefinition(int maxLoad) {
-        super(maxLoad);
+    public DefaultWashingMachineDefinition(int maxLoad, float tempCStep, float tempFStep) {
+        super(maxLoad,tempCStep, tempFStep);
     }
 
     @Override
