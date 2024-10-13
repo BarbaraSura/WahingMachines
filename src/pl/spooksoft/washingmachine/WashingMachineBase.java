@@ -1,6 +1,7 @@
 package pl.spooksoft.washingmachine;
 
 import pl.spooksoft.washingmachine.exceptions.InvalidSpinSpeedException;
+import pl.spooksoft.washingmachine.exceptions.LoadToHeavyExeption;
 import pl.spooksoft.washingmachine.exceptions.TemperatureOutOfRange;
 import pl.spooksoft.washingmachine.types.TemperatureUnit;
 
@@ -16,12 +17,24 @@ public abstract class WashingMachineBase {
 
     private float maxLoad;
 
+    public float getLoad() {
+        return load;
+    }
+
+    public void setLoad(float value) {
+        if (value> maxLoad){
+            throw new LoadToHeavyExeption();
+        }
+
+        this.load = value;
+    }
+
+    private float load;
+
     private int currentSpinSpeed;
 
     private ArrayList<WashingProgram> programs;
     private int currentProgramIndex;
-
-    private int delayTime;
 
     private float temperature;
     private float tempCStep;
@@ -30,7 +43,11 @@ public abstract class WashingMachineBase {
 
     private void internalSetTemperature(float newTemperature){
         temperature = newTemperature;
-        System.out.print("Current temperature is " + temperature );
+        displayTemperature();
+    }
+
+    private void displayTemperature() {
+        System.out.print("Obecna temperatura prania to: " + temperature );
         if (currentTempUnit == TemperatureUnit.Celsius){
             System.out.println(" °C");
         }
@@ -41,12 +58,6 @@ public abstract class WashingMachineBase {
             throw new RuntimeException("Unsupported temperature unit");
     }
 
-    //private Timestamp;
-    // dodać metodę showStatus;
-    // dodac metodę uruchamiania prania (przed zakończeniem doda pranie do historii)
-    // dodac metodę opoźniania prania - przyjmuje przez parametr czas opóźnienia (np. int) i zapisująca w polu
-    // po uruchomieniu prania wyświetlamy komunikat "Oczekiwanie ... godzin"
-
     public WashingMachineBase(WashingMachineDefinition definition){
         this.maxLoad = definition.getMaxLoad();
         this.programs = definition.generatePrograms();
@@ -56,9 +67,29 @@ public abstract class WashingMachineBase {
         this.currentTempUnit = TemperatureUnit.Celsius;
         this.temperature = 30.0f;
 
-//        if(maxLoad> definition.getMaxLoad()){
-//            throw Exeption?
-//        }
+    }
+
+    public void showStatus(){
+        System.out.println("STATUS:");
+        System.out.println("Nr programu: " + (currentProgramIndex +1) + " " +programs.get(currentProgramIndex).getProgramName() );
+        displayTemperature();
+        System.out.println("Obroty: " + currentSpinSpeed);
+        displayEstimatedDuration();
+        System.out.println("------------------------------------------");
+    }
+
+    public void startProgram(int delayTime){
+        System.out.println("Oczekiwanie na uruchomienie programu: " + delayTime + "h");
+        load = 0;
+    }
+
+    public void displayEstimatedDuration(){
+        if (load <= 0) {
+            return;
+        }
+
+        int estimateDuration = (int) (programs.get(currentProgramIndex).getApproximateDuration() *(load/maxLoad));
+        System.out.println("Szacowany czas: " + estimateDuration + " min.");
     }
 
     public TemperatureUnit getCurrentTempUnit() {
@@ -137,8 +168,8 @@ public abstract class WashingMachineBase {
 
     private void validateSpinSpeed(int value) {
         if (value < 0 ||
-                value >programs.get(currentProgramIndex).getMaxSpinSpeed() ||
-                value % 100 == 0){
+                value > programs.get(currentProgramIndex).getMaxSpinSpeed() ||
+                value % 100 != 0){
             throw new InvalidSpinSpeedException();
         }
     }

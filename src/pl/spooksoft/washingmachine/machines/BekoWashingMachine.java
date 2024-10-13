@@ -4,8 +4,7 @@ import pl.spooksoft.washingmachine.WashingMachineWithWeightBase;
 
 public class BekoWashingMachine extends WashingMachineWithWeightBase {
 
-
-    BekoWashingMachine() {
+    public BekoWashingMachine() {
         super(new BekoWashingMachineDefinition());
     }
 }

@@ -11,6 +11,8 @@ public abstract class WashingMachineDefinition {
 
     public WashingMachineDefinition(int maxLoad, float tempCStep, float tempFStep) {
         this.maxLoad = maxLoad;
+        this.tempCStep = tempCStep;
+        this.tempFStep = tempFStep;
     }
 
     public float getTempCStep() {
@@ -27,8 +29,4 @@ public abstract class WashingMachineDefinition {
 
     public abstract ArrayList<WashingProgram> generatePrograms();
 
-    //inicjuje maksymalny ładunek prania
-    // generator programów, przechowuje wszystkie parametry pralki
-    // nr - nazwa programu, domyślna prędkość wirowania(maksymalna?), temperatura, przybliżony czas trwania
-    // index danego programu
 }

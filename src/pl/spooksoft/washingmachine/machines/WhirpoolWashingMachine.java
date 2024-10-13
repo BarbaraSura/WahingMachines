@@ -4,7 +4,7 @@ import pl.spooksoft.washingmachine.WashingMachineBase;
 
 public class WhirpoolWashingMachine extends WashingMachineBase {
 
-    WhirpoolWashingMachine() {
+    public WhirpoolWashingMachine() {
         super(new WhirpoolWashingMachineDefinition());
     }
 }
