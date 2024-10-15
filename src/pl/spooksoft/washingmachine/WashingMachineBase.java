@@ -6,29 +6,17 @@ import pl.spooksoft.washingmachine.exceptions.TemperatureOutOfRange;
 import pl.spooksoft.washingmachine.types.TemperatureUnit;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public abstract class WashingMachineBase {
 
-    public static final int SPIN_SPEED_STEP = 100;
-    public static final int MIN_C_TEMP = 30;
-    public static final int MAX_C_TEMP = 90;
-    public static final int MIN_F_TEMP = 86;
-    public static final int MAX_F_TEMP = 194;
+    private static final int SPIN_SPEED_STEP = 100;
+    private static final int MIN_C_TEMP = 30;
+    private static final int MAX_C_TEMP = 90;
+    private static final int MIN_F_TEMP = 86;
+    private static final int MAX_F_TEMP = 194;
 
-    private float maxLoad;
-
-    public float getLoad() {
-        return load;
-    }
-
-    public void setLoad(float value) {
-        if (value> maxLoad){
-            throw new LoadToHeavyExeption();
-        }
-
-        this.load = value;
-    }
-
+    protected final float maxLoad;
     private float load;
 
     private int currentSpinSpeed;
@@ -36,10 +24,36 @@ public abstract class WashingMachineBase {
     private ArrayList<WashingProgram> programs;
     private int currentProgramIndex;
 
+    private LinkedList<WashingHistoryEntry> history;
+
     private float temperature;
     private float tempCStep;
     private float tempFStep;
     private TemperatureUnit currentTempUnit;
+
+    public WashingMachineBase(WashingMachineDefinition definition){
+        this.maxLoad = definition.getMaxLoad();
+        this.programs = definition.generatePrograms();
+        this.currentProgramIndex = 0;
+        this.tempCStep = definition.getTempCStep();
+        this.tempFStep = definition.getTempFStep();
+        this.currentTempUnit = TemperatureUnit.Celsius;
+        this.temperature = 30.0f;
+        this.history = new LinkedList<>();
+    }
+
+    protected void addHistoryEntry(){
+        WashingHistoryEntry entry = new WashingHistoryEntry(programs.get(currentProgramIndex), temperature, currentTempUnit, currentSpinSpeed);
+        internalAddHistoryEntry(entry);
+
+    }
+
+    protected void internalAddHistoryEntry(WashingHistoryEntry entry) {
+        history.addLast(entry);
+        if(history.size()>30){
+            history.removeFirst();
+        }
+    }
 
     private void internalSetTemperature(float newTemperature){
         temperature = newTemperature;
@@ -58,15 +72,15 @@ public abstract class WashingMachineBase {
             throw new RuntimeException("Unsupported temperature unit");
     }
 
-    public WashingMachineBase(WashingMachineDefinition definition){
-        this.maxLoad = definition.getMaxLoad();
-        this.programs = definition.generatePrograms();
-        this.currentProgramIndex = 0;
-        this.tempCStep = definition.getTempCStep();
-        this.tempFStep = definition.getTempFStep();
-        this.currentTempUnit = TemperatureUnit.Celsius;
-        this.temperature = 30.0f;
+    public float getLoad() {
+        return load;
+    }
 
+    public void setLoad(float value) {
+        if (value> maxLoad){
+            throw new LoadToHeavyExeption();
+        }
+        this.load = value;
     }
 
     public void showStatus(){
@@ -77,10 +91,16 @@ public abstract class WashingMachineBase {
         displayEstimatedDuration();
         System.out.println("------------------------------------------");
     }
+    public void startProgram(){
+        startProgram(0);
+    }
 
     public void startProgram(int delayTime){
         System.out.println("Oczekiwanie na uruchomienie programu: " + delayTime + "h");
+        addHistoryEntry();
+
         load = 0;
+
     }
 
     public void displayEstimatedDuration(){
@@ -112,7 +132,7 @@ public abstract class WashingMachineBase {
 
         } else if (currentTempUnit == TemperatureUnit.Farenheit) {
             float newTemperature = (temperature * 9.0f/5.0f) + 32;
-            newTemperature = alignTemperatureToUnit(temperature);
+            newTemperature = alignTemperatureToUnit(newTemperature);
             validateTemperature(newTemperature);
             internalSetTemperature(newTemperature);
         } else
@@ -235,4 +255,15 @@ public abstract class WashingMachineBase {
             throw new RuntimeException("Unsupported temperature unit");
     }
 
+    public WashingProgram getCurrentProgram(){
+        return programs.get(currentProgramIndex);
+    }
+
+    public void displayHistory() {
+
+        for (int i = 0; i < history.size(); i++) {
+            WashingHistoryEntry entry = history.get(i);
+            entry.display();
+        }
+    }
 }
